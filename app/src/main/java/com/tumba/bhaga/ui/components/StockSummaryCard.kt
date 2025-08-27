@@ -1,5 +1,6 @@
 package com.tumba.bhaga.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,12 +33,17 @@ import coil.compose.AsyncImage
 import com.tumba.bhaga.domain.models.StockSummary
 
 @Composable
-fun StockSummaryCard(stock: StockSummary, modifier: Modifier = Modifier) {
+fun StockSummaryCard(
+    stock: StockSummary,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val logoUrl = remember(stock.logoUrl) { stock.logoUrl }
 
     Card(
         shape = RoundedCornerShape(16.dp),
         modifier = modifier
+            .clickable(onClick = onClick)
             .padding(8.dp)
             .fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
