@@ -21,6 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.tumba.bhaga.domain.models.StockSummary
+import com.tumba.bhaga.ui.components.BottomAppBar
+import com.tumba.bhaga.ui.components.BottomBarOption
 import com.tumba.bhaga.ui.components.StockSummaryList
 import com.tumba.bhaga.ui.components.TopAppBar
 import com.tumba.bhaga.ui.components.TopBarAction
@@ -44,6 +46,25 @@ class MainActivity : ComponentActivity() {
                                 imageVector = Icons.Filled.Search,
                             ),
                             scrollBehaviorTop = null
+                        )
+                    },
+                    bottomBar = {
+                        BottomAppBar(
+                            selected = 2,
+                            navOptions = listOf(
+                                BottomBarOption(
+                                    label = "Home",
+                                    icon = Icons.Filled.Home
+                                ),
+                                BottomBarOption(
+                                    label = "Home",
+                                    icon = Icons.Filled.Home
+                                ),
+                                BottomBarOption(
+                                    label = "Home",
+                                    icon = Icons.Filled.Home
+                                )
+                            )
                         )
                     }
                 ) { innerPadding ->
