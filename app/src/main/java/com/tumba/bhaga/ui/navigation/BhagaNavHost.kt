@@ -10,7 +10,10 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.tumba.bhaga.ui.screens.favourites.FavouritesScreen
 import com.tumba.bhaga.ui.screens.home.HomeScreen
+import com.tumba.bhaga.ui.screens.search.SearchScreen
+import com.tumba.bhaga.ui.screens.settings.SettingsScreen
 import com.tumba.bhaga.ui.screens.stockdetail.StockDetailScreen
 
 @Composable
@@ -31,6 +34,18 @@ fun BhagaNavHost(
                 }
             )
         }
+        composable("settings") {
+            SettingsScreen()
+        }
+
+        composable("favourites") {
+            FavouritesScreen()
+        }
+
+        composable("search") {
+            SearchScreen()
+        }
+
         composable(
             route = "details/{ticker}",
             arguments = listOf(navArgument("ticker") {

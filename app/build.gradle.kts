@@ -2,6 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    kotlin("kapt")
+    kotlin("plugin.serialization") version "1.9.0" // Use your Kotlin version
+
 }
 
 android {
@@ -39,6 +42,10 @@ android {
     }
 }
 
+configurations.all {
+    exclude(group = "com.intellij", module = "annotations")
+}
+
 dependencies {
     // Coil
     implementation(libs.coil.kt.coil.compose)
@@ -55,6 +62,15 @@ dependencies {
 
     // Navigation
     implementation(libs.androidx.navigation.compose)
+
+    implementation(libs.annotations)
+
+    // Room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    kapt(libs.androidx.room.compiler)
+
+    implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

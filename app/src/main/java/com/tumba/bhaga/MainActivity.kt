@@ -19,10 +19,16 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.tumba.bhaga.domain.models.StockSummary
 import com.tumba.bhaga.ui.components.BottomAppBar
@@ -41,16 +47,60 @@ class MainActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
 
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentRoute = navBackStackEntry?.destination?.route
+
+            var selectedOption by remember { mutableIntStateOf(1) }
+            val navOption = remember {
+                mutableStateListOf(
+                    BottomBarOption(
+                        label = "Favourites",
+                        icon = Icons.Filled.Favorite,
+                        onClick = {
+                            selectedOption = 0
+                            navController.navigate("favourites")
+                        }
+                    ),
+                    BottomBarOption(
+                        label = "Home",
+                        icon = Icons.Filled.Home,
+                        onClick = {
+                            selectedOption = 1
+                            navController.navigate("home")
+                        }
+
+                    ),
+                    BottomBarOption(
+                        label = "Settings",
+                        icon = Icons.Filled.Settings,
+                        onClick = {
+                            selectedOption = 2
+                            navController.navigate("settings")
+                        }
+                    )
+                )
+            }
+
+            val isHome = currentRoute != "home"
+            val screenTitle = currentRoute
+                ?.substringBefore("/")
+                ?.replaceFirstChar { it.uppercaseChar() }
+                ?: "Unknown"
+
             BhagaTheme {
                 Scaffold(
                     topBar = {
                         TopAppBar(
-                            screenTitle = "Home",
-                            navigationAction = TopBarAction(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            ),
+                            screenTitle = screenTitle,
+                            navigationAction = if (isHome) {
+                                TopBarAction(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    onClick = { navController.popBackStack() }
+                                )
+                            } else null,
                             searchAction = TopBarAction(
                                 imageVector = Icons.Filled.Search,
+                                onClick = {  }
                             ),
                         )
                     },
@@ -62,30 +112,12 @@ class MainActivity : ComponentActivity() {
                     },
                     bottomBar = {
                         BottomAppBar(
-                            selected = 2,
-                            navOptions = listOf(
-                                BottomBarOption(
-                                    label = "Favorites",
-                                    icon = Icons.Filled.Favorite
-                                ),
-                                BottomBarOption(
-                                    label = "Home",
-                                    icon = Icons.Filled.Home
-                                ),
-                                BottomBarOption(
-                                    label = "Settings",
-                                    icon = Icons.Filled.Settings
-                                )
-                            )
+                            selected = selectedOption,
+                            navOptions = navOption
                         )
                     }
                 )
             }
         }
     }
-}
-
-@Composable
-fun BhagaApp() {
-
 }
