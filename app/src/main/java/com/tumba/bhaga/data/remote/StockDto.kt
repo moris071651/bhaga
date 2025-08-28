@@ -25,3 +25,11 @@ data class CompanyProfileDto(
     @SerialName("country") val country: String? = null,
     @SerialName("currency") val currency: String? = null
 )
+
+@Serializable
+data class CompanyNewsDto(
+    @SerialName("headline") val title: String,
+    @SerialName("image") val imageUrl: String,
+    @SerialName("summary") val summary: String,
+    @SerialName("url") val link: String,
+)
