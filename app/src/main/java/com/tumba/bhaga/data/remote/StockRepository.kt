@@ -30,32 +30,7 @@ class StockRepository(
                 cached.toStockSummary()
             }
             else {
-                val profile = api.getCompanyProfile(ticker)
-                val quote = api.getQuote(ticker)
-
-                val entity = StockEntity(
-                    ticker = ticker,
-                    companyName = profile.companyName ?: ticker,
-                    logoUrl = profile.logoUrl,
-                    website = profile.website,
-                    industry = profile.industry,
-                    exchange = profile.exchange,
-                    country = profile.country,
-                    currency = profile.currency,
-                    currentPrice = quote.currentPrice,
-                    highPrice = quote.highPrice,
-                    lowPrice = quote.lowPrice,
-                    openPrice = quote.openPrice,
-                    previousClosePrice = quote.previousClosePrice,
-                    priceChange = quote.priceChange,
-                    percentChange = quote.percentChange,
-                    lastUpdated = now
-                )
-
-                db.withTransaction {
-                    dao.insertStock(entity)
-                }
-
+                val entity = fetchNewStock(ticker, now)
                 entity.toStockSummary()
             }
         }
@@ -70,34 +45,39 @@ class StockRepository(
                 cached.toStockDetail()
             }
             else {
-                val profile = api.getCompanyProfile(ticker)
-                val quote = api.getQuote(ticker)
-
-                val entity = StockEntity(
-                    ticker = ticker,
-                    companyName = profile.companyName ?: ticker,
-                    logoUrl = profile.logoUrl,
-                    website = profile.website,
-                    industry = profile.industry,
-                    exchange = profile.exchange,
-                    country = profile.country,
-                    currency = profile.currency,
-                    currentPrice = quote.currentPrice,
-                    highPrice = quote.highPrice,
-                    lowPrice = quote.lowPrice,
-                    openPrice = quote.openPrice,
-                    previousClosePrice = quote.previousClosePrice,
-                    priceChange = quote.priceChange,
-                    percentChange = quote.percentChange,
-                    lastUpdated = now
-                )
-
-                db.withTransaction {
-                    dao.insertStock(entity)
-                }
-
+                val entity = fetchNewStock(ticker, now)
                 entity.toStockDetail()
             }
         }
+    }
+
+    suspend fun fetchNewStock(ticker: String, now: Long): StockEntity {
+        val profile = api.getCompanyProfile(ticker)
+        val quote = api.getQuote(ticker)
+
+        val entity = StockEntity(
+            ticker = ticker,
+            companyName = profile.companyName ?: ticker,
+            logoUrl = profile.logoUrl,
+            website = profile.website,
+            industry = profile.industry,
+            exchange = profile.exchange,
+            country = profile.country,
+            currency = profile.currency,
+            currentPrice = quote.currentPrice,
+            highPrice = quote.highPrice,
+            lowPrice = quote.lowPrice,
+            openPrice = quote.openPrice,
+            previousClosePrice = quote.previousClosePrice,
+            priceChange = quote.priceChange,
+            percentChange = quote.percentChange,
+            lastUpdated = now
+        )
+
+        db.withTransaction {
+            dao.insertStock(entity)
+        }
+
+        return entity
     }
 }

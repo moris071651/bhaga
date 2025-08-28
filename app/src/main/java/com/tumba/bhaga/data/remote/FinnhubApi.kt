@@ -1,5 +1,7 @@
 package com.tumba.bhaga.data.remote
 
+import com.tumba.bhaga.data.remote.dto.CompanyProfileDto
+import com.tumba.bhaga.data.remote.dto.QuoteDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
