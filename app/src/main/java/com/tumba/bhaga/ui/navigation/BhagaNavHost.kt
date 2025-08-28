@@ -30,7 +30,7 @@ fun BhagaNavHost(
             HomeScreen(
                 onStockClick = { ticker: String ->
                     println(ticker)
-//                    navController.navigate("details/$ticker")
+                    navController.navigate("details/$ticker")
                 }
             )
         }

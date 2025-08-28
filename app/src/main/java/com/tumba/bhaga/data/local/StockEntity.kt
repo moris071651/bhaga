@@ -2,6 +2,7 @@ package com.tumba.bhaga.data.local
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.tumba.bhaga.domain.models.StockDetail
 import com.tumba.bhaga.domain.models.StockSummary
 
 @Entity(tableName = "stocks")
@@ -40,4 +41,26 @@ fun StockEntity.toStockSummary(): StockSummary {
         percentChange = percentChange,
         isPositiveChange = priceChange >= 0
     )
+}
+
+fun StockEntity.toStockDetail(): StockDetail {
+    return StockDetail(
+        ticker = ticker,
+        companyName = companyName,
+        logoUrl = logoUrl,
+        currentPrice = currentPrice,
+        priceChange = priceChange,
+        percentChange = percentChange,
+        isPositiveChange = priceChange >= 0,
+        website = website,
+        industry = industry,
+        exchange = exchange,
+        country = country,
+        currency = currency,
+        highPrice = highPrice,
+        lowPrice = lowPrice,
+        openPrice = openPrice,
+        previousClosePrice = previousClosePrice
+    )
+
 }
