@@ -17,11 +17,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -45,6 +48,7 @@ fun StockDetailScreen(
     viewModel: StockDetailViewModel = remember { StockDetailViewModel() }
 ) {
     val stock by viewModel.stock.collectAsState()
+    val isFavourite by viewModel.isFavourite.collectAsState()
 
     LaunchedEffect(ticker) {
         viewModel.loadStock(ticker)
@@ -54,7 +58,8 @@ fun StockDetailScreen(
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
         }
-    } else {
+    }
+    else {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -74,11 +79,29 @@ fun StockDetailScreen(
                             contentDescription = stock!!.companyName,
                             modifier = Modifier.size(48.dp).clip(CircleShape)
                         )
+
                         Spacer(Modifier.width(12.dp))
+
                         Column {
                             Text(stock!!.companyName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                             Text(stock!!.ticker, style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
                         }
+
+                        Spacer(Modifier.weight(1f))
+
+                        IconButton(
+                            onClick = {
+                                if (isFavourite) viewModel.removeFromFavourites()
+                                else viewModel.addToFavourites()
+                            }
+                        ) {
+                            Icon(
+                                imageVector = if (isFavourite) Icons.Filled.Star else Icons.Outlined.Star,
+                                contentDescription = if (isFavourite) "Remove from favourites" else "Add to favourites",
+                                tint = if (isFavourite) Color(0xFFFFD700) else Color.Gray
+                            )
+                        }
+
                     }
 
                     Spacer(Modifier.height(16.dp))
@@ -170,73 +193,6 @@ fun StockDetailScreen(
     }
 }
 
-
-//@Composable
-//fun InfoRow(label: String, value: String) {
-//    Row(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .padding(vertical = 4.dp),
-//        horizontalArrangement = Arrangement.SpaceBetween
-//    ) {
-//        Text(text = label, style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
-//        Text(text = value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
-//    }
-//}
-
-//@Composable
-//fun StockInfoScreen(stock: StockDetail) {
-//    Column(modifier = Modifier
-//        .fillMaxSize()
-//        .padding(16.dp)
-//    ) {
-//        // Header
-//        Row(verticalAlignment = Alignment.CenterVertically) {
-//            AsyncImage(
-//                model = stock.logoUrl,
-//                contentDescription = stock.companyName,
-//                modifier = Modifier.size(48.dp).clip(CircleShape)
-//            )
-//            Spacer(modifier = Modifier.width(12.dp))
-//            Column {
-//                Text(stock.companyName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-//                Text(stock.ticker, style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
-//            }
-//        }
-//
-//        Spacer(modifier = Modifier.height(16.dp))
-//
-//        // Price
-//        Text(
-//            "$${"%.2f".format(stock.currentPrice)}",
-//            style = MaterialTheme.typography.headlineMedium,
-//            fontWeight = FontWeight.Bold
-//        )
-//        Text(
-//            "${if(stock.isPositiveChange) "+" else "-"}${"%.2f".format(stock.priceChange)} (${ "%.2f".format(stock.percentChange)}%)",
-//            color = if(stock.isPositiveChange) Color.Green else Color.Red,
-//            style = MaterialTheme.typography.bodyMedium
-//        )
-//
-//        Spacer(modifier = Modifier.height(16.dp))
-//
-//        // Day info
-//        InfoRow("Open", "$${"%.2f".format(stock.openPrice)}")
-//        InfoRow("High", "$${"%.2f".format(stock.highPrice)}")
-//        InfoRow("Low", "$${"%.2f".format(stock.lowPrice)}")
-//        InfoRow("Previous Close", "$${"%.2f".format(stock.previousClosePrice)}")
-//
-//        Spacer(modifier = Modifier.height(16.dp))
-//
-//        // Additional info
-//        stock.website?.let { InfoRow("Website", it) }
-//        stock.industry?.let { InfoRow("Industry", it) }
-//        stock.exchange?.let { InfoRow("Exchange", it) }
-//        stock.country?.let { InfoRow("Country", it) }
-//        stock.currency?.let { InfoRow("Currency", it) }
-//    }
-//}
-//
 @Composable
 fun InfoRow(label: String, value: String) {
     Row(

@@ -39,7 +39,12 @@ fun BhagaNavHost(
         }
 
         composable("favourites") {
-            FavouritesScreen()
+            FavouritesScreen(
+                onStockClick = { ticker: String ->
+                    println(ticker)
+                    navController.navigate("details/$ticker")
+                }
+            )
         }
 
         composable("search") {

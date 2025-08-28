@@ -1,5 +1,6 @@
 package com.tumba.bhaga.data.remote
 
+import android.util.Log
 import androidx.room.withTransaction
 import com.tumba.bhaga.data.local.StockDatabase
 import com.tumba.bhaga.data.local.toStockSummary
@@ -123,8 +124,17 @@ class StockRepository(
     // -----------------------------
     // Favorites
     // -----------------------------
-    suspend fun addFavourite(ticker: String) = dao.addFavourite(FavouriteEntity(ticker = ticker))
-    suspend fun removeFavourite(ticker: String) = dao.removeFavourite(ticker)
-    suspend fun getFavouriteCompanies(): List<StockSummary> =
-        dao.getFavouriteCompanies().map { it.toStockSummary() }
+    suspend fun addFavourite(ticker: String) {
+        return dao.addFavourite(FavouriteEntity(ticker = ticker))
+    }
+
+    suspend fun removeFavourite(ticker: String) {
+        return dao.removeFavourite(ticker)
+    }
+
+    suspend fun getFavouriteCompanies(): List<StockSummary> {
+        return dao.getFavouriteCompanies().map {
+            it.toStockSummary()
+        }
+    }
 }

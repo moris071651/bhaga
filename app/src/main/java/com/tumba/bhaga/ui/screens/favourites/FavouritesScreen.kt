@@ -1,5 +1,6 @@
 package com.tumba.bhaga.ui.screens.favourites
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
@@ -19,21 +20,29 @@ fun FavouritesScreen(
     viewModel: FavouritesViewModel = FavouritesViewModel()
 ) {
     val favourites by viewModel.favourites.collectAsState()
-
-    LaunchedEffect(Unit) {
-        viewModel.loadFavourites()
-    }
-
-    if (favourites.isEmpty()) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator()
+    val isLoading by viewModel.isLoading.collectAsState()
+    
+    when {
+        isLoading -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+        favourites.isEmpty() -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("No favourites yet")
+            }
+        }
+        else -> {
+            StockSummaryList(favourites, onStockClick)
         }
     }
-    else {
-        StockSummaryList(favourites, onStockClick)
-    }
 }
+
 

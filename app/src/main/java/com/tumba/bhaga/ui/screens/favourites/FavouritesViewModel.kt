@@ -1,5 +1,6 @@
 package com.tumba.bhaga.ui.screens.favourites
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tumba.bhaga.data.di.AppModule.repository
@@ -16,19 +17,19 @@ class FavouritesViewModel() : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    fun loadFavourites() {
+    init {
         viewModelScope.launch {
             _isLoading.value = true
             try {
                 val list = repository.getFavouriteCompanies()
                 _favourites.value = list
-            } catch (e: Exception) {
-                // Optionally handle errors
+            }
+            catch (e: Exception) {
                 _favourites.value = emptyList()
-            } finally {
+            }
+            finally {
                 _isLoading.value = false
             }
         }
     }
 }
-
