@@ -1,9 +1,39 @@
 package com.tumba.bhaga.ui.screens.favourites
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import com.tumba.bhaga.ui.components.StockSummaryList
 
 @Composable
-fun FavouritesScreen() {
-    Text("Favourites")
+fun FavouritesScreen(
+    onStockClick: (String) -> Unit,
+    viewModel: FavouritesViewModel = FavouritesViewModel()
+) {
+    val favourites by viewModel.favourites.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.loadFavourites()
+    }
+
+    if (favourites.isEmpty()) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+    }
+    else {
+        StockSummaryList(favourites, onStockClick)
+    }
 }
+

@@ -9,4 +9,5 @@ data class CompanyNewsDto(
     @SerialName("image") val imageUrl: String,
     @SerialName("summary") val summary: String,
     @SerialName("url") val link: String,
+    @SerialName("datetime") val publishedAt: Long,
 )

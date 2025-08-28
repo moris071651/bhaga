@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.tumba.bhaga.ui.components.StockNewsList
 
 @Composable
 fun StockDetailScreen(
@@ -131,7 +132,7 @@ fun StockDetailScreen(
                 }
             }
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(16.dp))
 
             // Price info card
             Card(
@@ -163,6 +164,8 @@ fun StockDetailScreen(
                     stock!!.currency?.let { InfoRow("Currency", it) }
                 }
             }
+
+            StockNewsList(stock!!.newsList)
         }
     }
 }

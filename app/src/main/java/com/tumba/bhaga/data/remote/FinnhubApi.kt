@@ -29,7 +29,7 @@ class FinnhubApi(
         }.body()
     }
 
-    suspend fun getCompanyNews(ticker: String): CompanyNewsDto {
+    suspend fun getCompanyNews(ticker: String): List<CompanyNewsDto> {
         val today = LocalDate.now()
         val dayAgo = today.minusDays(1)
 
@@ -38,6 +38,6 @@ class FinnhubApi(
             parameter("from", dayAgo.toString())
             parameter("to", today.toString())
             parameter("token", apiKey)
-        }.body()
+        }.body<List<CompanyNewsDto>>().take(6)
     }
 }

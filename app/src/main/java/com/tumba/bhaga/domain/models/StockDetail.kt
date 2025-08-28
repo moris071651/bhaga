@@ -16,5 +16,6 @@ data class StockDetail(
     val previousClosePrice: Double,
     val priceChange: Double,
     val percentChange: Double,
-    val isPositiveChange: Boolean
+    val isPositiveChange: Boolean,
+    val newsList: List<StockNews>
 )

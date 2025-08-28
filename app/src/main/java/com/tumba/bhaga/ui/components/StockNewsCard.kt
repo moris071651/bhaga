@@ -53,7 +53,7 @@ fun StockNewsCard(news: StockNews, modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = news.summary,
+                text = news.summary ?: "",
                 style = MaterialTheme.typography.bodySmall,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
