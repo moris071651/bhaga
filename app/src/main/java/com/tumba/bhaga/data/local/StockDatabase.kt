@@ -4,6 +4,16 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.tumba.bhaga.data.local.dao.FavouritesDao
+import com.tumba.bhaga.data.local.dao.InvalidationDao
+import com.tumba.bhaga.data.local.dao.NewsDao
+import com.tumba.bhaga.data.local.dao.SearchDao
+import com.tumba.bhaga.data.local.dao.StockDao
+import com.tumba.bhaga.data.local.entity.CompanyNewsEntity
+import com.tumba.bhaga.data.local.entity.CompanyProfileEntity
+import com.tumba.bhaga.data.local.entity.FavouriteEntity
+import com.tumba.bhaga.data.local.entity.QuoteEntity
+import com.tumba.bhaga.data.local.entity.SearchEntryEntity
 import java.io.FileOutputStream
 
 @Database(
@@ -19,6 +29,14 @@ import java.io.FileOutputStream
 )
 abstract class StockDatabase : RoomDatabase() {
     abstract fun stockDao(): StockDao
+
+    abstract fun favouritesDao(): FavouritesDao
+
+    abstract fun invalidationDao(): InvalidationDao
+
+    abstract fun newsDao(): NewsDao
+
+    abstract fun searchDao(): SearchDao
 
     companion object {
         @Volatile private var INSTANCE: StockDatabase? = null
