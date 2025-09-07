@@ -1,16 +1,14 @@
-package com.tumba.bhaga.data.remote
+package com.tumba.bhaga.data.repository
 
 import androidx.room.withTransaction
 import com.tumba.bhaga.data.local.StockDatabase
 import com.tumba.bhaga.domain.models.StockSummary
 import com.tumba.bhaga.data.local.entity.CompanyNewsEntity
 import com.tumba.bhaga.data.local.entity.CompanyProfileEntity
-import com.tumba.bhaga.data.local.entity.FavouriteEntity
 import com.tumba.bhaga.data.local.entity.QuoteEntity
-import com.tumba.bhaga.data.local.entity.toSearchEntry
 import com.tumba.bhaga.data.local.entity.toStockDetail
 import com.tumba.bhaga.data.local.entity.toStockSummary
-import com.tumba.bhaga.domain.models.SearchEntry
+import com.tumba.bhaga.data.remote.FinnhubApi
 import com.tumba.bhaga.domain.models.StockDetail
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -28,7 +26,8 @@ class StockRepository(
         val now = System.currentTimeMillis()
         var company = dao.getCompanyWithQuote(ticker)
 
-        val profileStale = company?.profile?.let { now - it.lastUpdated > profileCacheMillis } ?: true
+        val profileStale =
+            company?.profile?.let { now - it.lastUpdated > profileCacheMillis } ?: true
         val quoteStale = company?.quote?.let { now - it.lastUpdated > quoteCacheMillis } ?: true
 
         if (profileStale || quoteStale) {
@@ -48,9 +47,13 @@ class StockRepository(
         val now = System.currentTimeMillis()
 
         val companyWithQuoteAndNews = dao.getCompanyWithQuoteAndNews(ticker)
-        val profileStale = companyWithQuoteAndNews?.profile?.let { now - it.lastUpdated > profileCacheMillis } ?: true
-        val quoteStale = companyWithQuoteAndNews?.quote?.let { now - it.lastUpdated > quoteCacheMillis } ?: true
-        val newsStale = companyWithQuoteAndNews?.news?.firstOrNull()?.let { now - it.lastUpdated > newsCacheMillis } ?: true
+        val profileStale =
+            companyWithQuoteAndNews?.profile?.let { now - it.lastUpdated > profileCacheMillis }
+                ?: true
+        val quoteStale =
+            companyWithQuoteAndNews?.quote?.let { now - it.lastUpdated > quoteCacheMillis } ?: true
+        val newsStale = companyWithQuoteAndNews?.news?.firstOrNull()
+            ?.let { now - it.lastUpdated > newsCacheMillis } ?: true
 
         if (profileStale) fetchAndSaveProfile(ticker, now)
         if (quoteStale) fetchAndSaveQuote(ticker, now)
@@ -115,44 +118,5 @@ class StockRepository(
 
         dao.clearNewsForTicker(ticker)
         dao.insertNews(entities)
-    }
-
-    suspend fun addFavourite(ticker: String) {
-        val dao = db.favouritesDao()
-        return dao.addFavourite(FavouriteEntity(ticker = ticker))
-    }
-
-    suspend fun removeFavourite(ticker: String) {
-        val dao = db.favouritesDao()
-        return dao.removeFavourite(ticker)
-    }
-
-    suspend fun getFavouriteCompanies(): List<StockSummary> {
-        val dao = db.favouritesDao()
-        return dao.getFavouriteCompanies().map {
-            it.toStockSummary()
-        }
-    }
-
-    suspend fun invalidateAllStockData() = withContext(Dispatchers.IO) {
-        val dao = db.invalidationDao()
-        dao.invalidateAllQuotes()
-    }
-
-    suspend fun invalidateAllCompanyData() = withContext(Dispatchers.IO) {
-        val dao = db.invalidationDao()
-        dao.invalidateAllCompanyProfiles()
-    }
-
-    suspend fun invalidateAllNewsData() = withContext(Dispatchers.IO) {
-        val dao = db.invalidationDao()
-        dao.invalidateAllNews()
-    }
-
-    suspend fun getAllSearchEntries(): List<SearchEntry> {
-        val dao = db.searchDao()
-        return dao.getAllSearchEntries().map {
-            it.toSearchEntry()
-        }
     }
 }
