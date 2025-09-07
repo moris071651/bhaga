@@ -9,7 +9,10 @@ import com.tumba.bhaga.data.local.CompanyNewsEntity
 import com.tumba.bhaga.data.local.CompanyProfileEntity
 import com.tumba.bhaga.data.local.FavouriteEntity
 import com.tumba.bhaga.data.local.QuoteEntity
+import com.tumba.bhaga.data.local.SearchEntryEntity
+import com.tumba.bhaga.data.local.toSearchEntry
 import com.tumba.bhaga.data.local.toStockDetail
+import com.tumba.bhaga.domain.models.SearchEntry
 import com.tumba.bhaga.domain.models.StockDetail
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -24,9 +27,6 @@ class StockRepository(
 
     private val dao = db.stockDao()
 
-    // -----------------------------
-    // Get stock summary (profile + quote)
-    // -----------------------------
     suspend fun getStockSummary(ticker: String): StockSummary = withContext(Dispatchers.IO) {
         val now = System.currentTimeMillis()
         var company = dao.getCompanyWithQuote(ticker)
@@ -45,27 +45,21 @@ class StockRepository(
         company!!.toStockSummary()
     }
 
-    // -----------------------------
-    // Get stock detail (profile + quote + news)
-    // -----------------------------
     suspend fun getStockDetail(ticker: String): StockDetail = withContext(Dispatchers.IO) {
         val now = System.currentTimeMillis()
 
         val companyWithQuoteAndNews = dao.getCompanyWithQuoteAndNews(ticker)
+        val profileStale = companyWithQuoteAndNews?.profile?.let { now - it.lastUpdated > profileCacheMillis } ?: true
         val quoteStale = companyWithQuoteAndNews?.quote?.let { now - it.lastUpdated > quoteCacheMillis } ?: true
         val newsStale = companyWithQuoteAndNews?.news?.firstOrNull()?.let { now - it.lastUpdated > newsCacheMillis } ?: true
-        val profileStale = companyWithQuoteAndNews?.profile?.let { now - it.lastUpdated > profileCacheMillis } ?: true
 
-        if (quoteStale) fetchAndSaveQuote(ticker, now)
         if (profileStale) fetchAndSaveProfile(ticker, now)
+        if (quoteStale) fetchAndSaveQuote(ticker, now)
         if (newsStale) fetchAndSaveNews(ticker, now)
 
         dao.getCompanyWithQuoteAndNews(ticker)!!.toStockDetail()
     }
 
-    // -----------------------------
-    // Fetch & save profile
-    // -----------------------------
     private suspend fun fetchAndSaveProfile(ticker: String, now: Long) {
         val profile = api.getCompanyProfile(ticker)
         val entity = CompanyProfileEntity(
@@ -79,12 +73,10 @@ class StockRepository(
             currency = profile.currency,
             lastUpdated = now
         )
+
         dao.insertCompanyProfile(entity)
     }
 
-    // -----------------------------
-    // Fetch & save quote
-    // -----------------------------
     private suspend fun fetchAndSaveQuote(ticker: String, now: Long) {
         val quote = api.getQuote(ticker)
         val entity = QuoteEntity(
@@ -98,12 +90,10 @@ class StockRepository(
             percentChange = quote.percentChange,
             lastUpdated = now
         )
+
         dao.insertQuote(entity)
     }
 
-    // -----------------------------
-    // Fetch & save news
-    // -----------------------------
     private suspend fun fetchAndSaveNews(ticker: String, now: Long) {
         val newsList = api.getCompanyNews(ticker)
         val entities = newsList.map {
@@ -117,13 +107,11 @@ class StockRepository(
                 lastUpdated = now
             )
         }
+
         dao.clearNewsForTicker(ticker)
         dao.insertNews(entities)
     }
 
-    // -----------------------------
-    // Favorites
-    // -----------------------------
     suspend fun addFavourite(ticker: String) {
         return dao.addFavourite(FavouriteEntity(ticker = ticker))
     }
@@ -135,6 +123,24 @@ class StockRepository(
     suspend fun getFavouriteCompanies(): List<StockSummary> {
         return dao.getFavouriteCompanies().map {
             it.toStockSummary()
+        }
+    }
+
+    suspend fun invalidateAllStockData() = withContext(Dispatchers.IO) {
+        dao.invalidateAllQuotes()
+    }
+
+    suspend fun invalidateAllCompanyData() = withContext(Dispatchers.IO) {
+        dao.invalidateAllCompanyProfiles()
+    }
+
+    suspend fun invalidateAllNewsData() = withContext(Dispatchers.IO) {
+        dao.invalidateAllNews()
+    }
+
+    suspend fun getAllSearchEntries(): List<SearchEntry> {
+        return dao.getAllSearchEntries().map {
+            it.toSearchEntry()
         }
     }
 }
