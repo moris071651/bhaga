@@ -39,7 +39,9 @@ import com.tumba.bhaga.ui.components.TopAppBar
 import com.tumba.bhaga.ui.components.TopBarAction
 import com.tumba.bhaga.ui.navigation.BhagaNavHost
 import com.tumba.bhaga.ui.theme.BhagaTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
