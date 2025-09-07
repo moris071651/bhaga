@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -50,14 +51,12 @@ class MainActivity : ComponentActivity() {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination?.route
 
-            var selectedOption by remember { mutableIntStateOf(1) }
             val navOption = remember {
                 mutableStateListOf(
                     BottomBarOption(
                         label = "Favourites",
-                        icon = Icons.Filled.Favorite,
+                        icon = Icons.Filled.Star,
                         onClick = {
-                            selectedOption = 0
                             navController.navigate("favourites")
                         }
                     ),
@@ -65,7 +64,6 @@ class MainActivity : ComponentActivity() {
                         label = "Home",
                         icon = Icons.Filled.Home,
                         onClick = {
-                            selectedOption = 1
                             navController.navigate("home")
                         }
 
@@ -74,14 +72,20 @@ class MainActivity : ComponentActivity() {
                         label = "Settings",
                         icon = Icons.Filled.Settings,
                         onClick = {
-                            selectedOption = 2
                             navController.navigate("settings")
                         }
                     )
                 )
             }
 
-            val isHome = currentRoute != "home"
+            val selectedOption = when(currentRoute) {
+                "favourites" -> 0
+                "home" -> 1
+                "settings" -> 2
+                else -> -1
+            }
+
+            val isHome = selectedOption == 1
             val screenTitle = currentRoute
                 ?.substringBefore("/")
                 ?.replaceFirstChar { it.uppercaseChar() }
@@ -90,19 +94,21 @@ class MainActivity : ComponentActivity() {
             BhagaTheme {
                 Scaffold(
                     topBar = {
-                        TopAppBar(
-                            screenTitle = screenTitle,
-                            navigationAction = if (isHome) {
-                                TopBarAction(
-                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                    onClick = { navController.popBackStack() }
-                                )
-                            } else null,
-                            searchAction = TopBarAction(
-                                imageVector = Icons.Filled.Search,
-                                onClick = {  }
-                            ),
-                        )
+                        if (currentRoute != "search") {
+                            TopAppBar(
+                                screenTitle = screenTitle,
+                                navigationAction = if (!isHome) {
+                                    TopBarAction(
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                        onClick = { navController.popBackStack() }
+                                    )
+                                } else null,
+                                searchAction = TopBarAction(
+                                    imageVector = Icons.Filled.Search,
+                                    onClick = { navController.navigate("search") }
+                                ),
+                            )
+                        }
                     },
                     content = { innerPadding ->
                         BhagaNavHost(
@@ -111,10 +117,12 @@ class MainActivity : ComponentActivity() {
                         )
                     },
                     bottomBar = {
-                        BottomAppBar(
-                            selected = selectedOption,
-                            navOptions = navOption
-                        )
+                        if (selectedOption >= 0) {
+                            BottomAppBar(
+                                selected = selectedOption,
+                                navOptions = navOption
+                            )
+                        }
                     }
                 )
             }
