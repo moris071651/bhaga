@@ -1,8 +1,11 @@
 package com.tumba.bhaga.data.remote
 
+import com.tumba.bhaga.data.local.TokenManager
 import com.tumba.bhaga.data.remote.dto.CompanyNewsDto
 import com.tumba.bhaga.data.remote.dto.CompanyProfileDto
 import com.tumba.bhaga.data.remote.dto.QuoteDto
+import com.tumba.bhaga.data.remote.dto.SearchEntryDTO
+import com.tumba.bhaga.domain.models.SearchEntry
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -11,21 +14,21 @@ import java.time.LocalDate
 
 class FinnhubApi(
     private val client: HttpClient,
-    private val apiKey: String
+    private val tokenManager: TokenManager
 ) {
 
     private val API_PREFIX = "https://finnhub.io/api/v1"
     suspend fun getQuote(ticker: String): QuoteDto {
         return client.get("$API_PREFIX/quote") {
             parameter("symbol", ticker)
-            parameter("token", apiKey)
+            parameter("token", tokenManager.getToken())
         }.body()
     }
 
     suspend fun getCompanyProfile(ticker: String): CompanyProfileDto {
         return client.get("$API_PREFIX/stock/profile2") {
             parameter("symbol", ticker)
-            parameter("token", apiKey)
+            parameter("token", tokenManager.getToken())
         }.body()
     }
 
@@ -37,7 +40,21 @@ class FinnhubApi(
             parameter("symbol", ticker)
             parameter("from", dayAgo.toString())
             parameter("to", today.toString())
-            parameter("token", apiKey)
+            parameter("token", tokenManager.getToken())
         }.body<List<CompanyNewsDto>>().take(6)
+    }
+
+    suspend fun getAllTickers(): List<SearchEntryDTO> {
+        return client.get("$API_PREFIX/stock/symbol") {
+            parameter("exchange", "US")
+            parameter("token", tokenManager.getToken())
+        }.body()
+    }
+
+    suspend fun checkTokenStatus(token: String): Int {
+        return client.get("$API_PREFIX/quote") {
+            parameter("symbol", "AAPL")
+            parameter("token", token)
+        }.status.value
     }
 }
