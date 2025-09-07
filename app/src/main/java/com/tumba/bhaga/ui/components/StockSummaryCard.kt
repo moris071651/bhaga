@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -12,7 +13,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -48,63 +52,49 @@ fun StockSummaryCard(
             .fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row {
-                AsyncImage(
-                    model = logoUrl,
-                    contentDescription = "${stock.companyName} logo",
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape)
+        Row(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            AsyncImage(
+                model = logoUrl,
+                contentDescription = "${stock.companyName} logo",
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+            )
+
+            Spacer(Modifier.width(12.dp))
+
+            Column(
+                modifier = Modifier.fillMaxHeight()
+            ) {
+                Text(
+                    text = stock.ticker,
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold
                 )
 
-                Spacer(Modifier.width(12.dp))
+                Text(
+                    stock.companyName,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                    modifier = Modifier.fillMaxWidth(0.4f)
+                )
+            }
 
-                Column {
-                    Text(
-                        text = stock.ticker,
-                        style = MaterialTheme.typography.labelLarge,
-                        fontWeight = FontWeight.Bold
-                    )
+            Spacer(Modifier.weight(1f))
 
-                    Text(
-                        stock.companyName,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.Gray,
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 1,
-                        modifier = Modifier.fillMaxWidth(0.4f)
-                    )
-                }
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text("% .2f".format(stock.currentPrice))
 
-                Spacer(Modifier.weight(1f))
-
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text("% .2f".format(stock.currentPrice))
-
-                    Surface(
-                        color = Color.Green.copy(alpha = 0.1f),
-                        shape = RoundedCornerShape(50),
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowDropDown,
-                                contentDescription = null,
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Text(
-                                text = "${"%.2f".format(stock.percentChange)}%",
-                                style = MaterialTheme.typography.bodySmall,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
-                    }
-                }
+                PercentChangeBadge(
+                    stock.percentChange,
+                    stock.isPositiveChange,
+                )
             }
         }
     }
