@@ -2,14 +2,21 @@ package com.tumba.bhaga.ui.screens.stockdetail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tumba.bhaga.data.di.AppModule.repository
+import com.tumba.bhaga.data.repository.FavouritesRepository
+import com.tumba.bhaga.data.repository.StockRepository
 import com.tumba.bhaga.domain.models.StockDetail
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class StockDetailViewModel() : ViewModel() {
+@HiltViewModel
+class StockDetailViewModel @Inject constructor(
+    private val repository: StockRepository,
+    private val favouritesRepository: FavouritesRepository
+) : ViewModel() {
 
     private val _stock = MutableStateFlow<StockDetail?>(null)
     val stock: StateFlow<StockDetail?> = _stock
@@ -20,17 +27,14 @@ class StockDetailViewModel() : ViewModel() {
     fun loadStock(ticker: String) {
         viewModelScope.launch(Dispatchers.IO) {
             _stock.value = repository.getStockDetail(ticker)
-
-            // Check if this stock is already a favourite
-            val favourites = repository.getFavouriteCompanies()
-            _isFavourite.value = favourites.any { it.ticker == ticker }
+            _isFavourite.value = favouritesRepository.checkFavourite(ticker)
         }
     }
 
     fun addToFavourites() {
         viewModelScope.launch(Dispatchers.IO) {
             _stock.value?.ticker?.let {
-                repository.addFavourite(it)
+                favouritesRepository.addFavourite(it)
                 _isFavourite.value = true
             }
         }
@@ -39,7 +43,7 @@ class StockDetailViewModel() : ViewModel() {
     fun removeFromFavourites() {
         viewModelScope.launch(Dispatchers.IO) {
             _stock.value?.ticker?.let {
-                repository.removeFavourite(it)
+                favouritesRepository.removeFavourite(it)
                 _isFavourite.value = false
             }
         }

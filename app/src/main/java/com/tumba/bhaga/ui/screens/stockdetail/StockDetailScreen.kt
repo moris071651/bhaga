@@ -41,6 +41,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.tumba.bhaga.ui.components.PercentChangeBadge
 import com.tumba.bhaga.ui.components.StockNewsList
@@ -49,7 +50,7 @@ import kotlin.math.abs
 @Composable
 fun StockDetailScreen(
     ticker: String,
-    viewModel: StockDetailViewModel = remember { StockDetailViewModel() }
+    viewModel: StockDetailViewModel = hiltViewModel()
 ) {
     val stock by viewModel.stock.collectAsState()
     val isFavourite by viewModel.isFavourite.collectAsState()
