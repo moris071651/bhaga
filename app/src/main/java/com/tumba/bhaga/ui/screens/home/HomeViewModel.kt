@@ -5,15 +5,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tumba.bhaga.data.di.AppModule.repository
+import com.tumba.bhaga.data.repository.StockRepository
 import com.tumba.bhaga.domain.models.StockSummary
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class HomeViewModel() : ViewModel() {
+@HiltViewModel
+class HomeViewModel @Inject constructor(
+    private val repository: StockRepository
+) : ViewModel() {
     var stocks by mutableStateOf<List<StockSummary>>(listOf())
         private set
 

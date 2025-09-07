@@ -6,12 +6,13 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.tumba.bhaga.ui.components.StockSummaryList
 
 @Composable
 fun HomeScreen(
     onStockClick: (String) -> Unit,
-    viewModel: HomeViewModel = HomeViewModel()
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
     val stocks = viewModel.stocks
 
