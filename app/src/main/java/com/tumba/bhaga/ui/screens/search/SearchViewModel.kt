@@ -1,16 +1,19 @@
 package com.tumba.bhaga.ui.screens.search
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tumba.bhaga.data.di.AppModule.repository
+import com.tumba.bhaga.data.repository.SearchRepository
 import com.tumba.bhaga.domain.models.SearchEntry
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-
-class SearchViewModel() : ViewModel() {
+@HiltViewModel
+class SearchViewModel @Inject constructor(
+    private val repository: SearchRepository
+) : ViewModel() {
     private val _entries = MutableStateFlow<List<SearchEntry>>(listOf())
     val entries: StateFlow<List<SearchEntry>> = _entries
 
