@@ -48,7 +48,11 @@ fun BhagaNavHost(
         }
 
         composable("search") {
-            SearchScreen()
+            SearchScreen(
+                onStockClick = {
+                    navController.navigate("details/$it")
+                }
+            )
         }
 
         composable(
