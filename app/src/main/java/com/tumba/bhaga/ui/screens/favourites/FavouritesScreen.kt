@@ -21,7 +21,7 @@ fun FavouritesScreen(
 ) {
     val favourites by viewModel.favourites.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
-    
+
     when {
         isLoading -> {
             Box(

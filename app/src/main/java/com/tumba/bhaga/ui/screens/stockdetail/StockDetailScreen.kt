@@ -17,6 +17,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.outlined.Star
@@ -40,7 +42,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.tumba.bhaga.ui.components.PercentChangeBadge
 import com.tumba.bhaga.ui.components.StockNewsList
+import kotlin.math.abs
 
 @Composable
 fun StockDetailScreen(
@@ -61,134 +65,118 @@ fun StockDetailScreen(
     }
     else {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
+            modifier = Modifier.fillMaxWidth()
                 .verticalScroll(rememberScrollState())
         ) {
-            // Header Card
-            Card(
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(8.dp),
-                modifier = Modifier.fillMaxWidth()
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        AsyncImage(
-                            model = stock!!.logoUrl,
-                            contentDescription = stock!!.companyName,
-                            modifier = Modifier.size(48.dp).clip(CircleShape)
-                        )
+                Card(
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            AsyncImage(
+                                model = stock!!.logoUrl,
+                                contentDescription = stock!!.companyName,
+                                modifier = Modifier.size(48.dp).clip(CircleShape)
+                            )
 
-                        Spacer(Modifier.width(12.dp))
+                            Spacer(Modifier.width(12.dp))
 
-                        Column {
-                            Text(stock!!.companyName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                            Text(stock!!.ticker, style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
-                        }
-
-                        Spacer(Modifier.weight(1f))
-
-                        IconButton(
-                            onClick = {
-                                if (isFavourite) viewModel.removeFromFavourites()
-                                else viewModel.addToFavourites()
+                            Column {
+                                Text(stock!!.companyName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                                Text(stock!!.ticker, style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
                             }
-                        ) {
-                            Icon(
-                                imageVector = if (isFavourite) Icons.Filled.Star else Icons.Outlined.Star,
-                                contentDescription = if (isFavourite) "Remove from favourites" else "Add to favourites",
-                                tint = if (isFavourite) Color(0xFFFFD700) else Color.Gray
-                            )
-                        }
 
-                    }
+                            Spacer(Modifier.weight(1f))
 
-                    Spacer(Modifier.height(16.dp))
-
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column {
-                            Text(
-                                "$${"%.2f".format(stock!!.currentPrice)}",
-                                style = MaterialTheme.typography.headlineMedium,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Spacer(Modifier.height(4.dp))
-                            Text(
-                                "${if (stock!!.isPositiveChange) "+" else "-"}${"%.2f".format(stock!!.priceChange)} (${ "%.2f".format(stock!!.percentChange)}%)",
-                                color = if (stock!!.isPositiveChange) Color(0xFF4CAF50) else Color(0xFFF44336),
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
-
-                        // Change badge
-                        Surface(
-                            color = if (stock!!.isPositiveChange) Color(0xFFE8F5E9) else Color(0xFFFFEBEE),
-                            shape = RoundedCornerShape(50),
-                            modifier = Modifier.padding(start = 8.dp)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Center,
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                            IconButton(
+                                onClick = {
+                                    if (isFavourite) viewModel.removeFromFavourites()
+                                    else viewModel.addToFavourites()
+                                }
                             ) {
                                 Icon(
-                                    imageVector = if (stock!!.isPositiveChange) Icons.Default.ThumbUp else Icons.Default.ArrowDropDown,
-                                    contentDescription = null,
-                                    tint = if (stock!!.isPositiveChange) Color(0xFF4CAF50) else Color(0xFFF44336),
-                                    modifier = Modifier.size(16.dp)
-                                )
-                                Text(
-                                    text = "${"%.2f".format(stock!!.percentChange)}%",
-                                    color = if (stock!!.isPositiveChange) Color(0xFF4CAF50) else Color(0xFFF44336),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    fontWeight = FontWeight.Bold
+                                    imageVector = if (isFavourite) Icons.Filled.Star else Icons.Outlined.Star,
+                                    contentDescription = if (isFavourite) "Remove from favourites" else "Add to favourites",
+                                    tint = if (isFavourite) Color.Yellow else Color.Gray
                                 )
                             }
+
                         }
+
+                        Spacer(Modifier.height(16.dp))
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Column {
+                                Text(
+                                    "$${"%.2f".format(stock!!.currentPrice)}",
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
+
+                                Spacer(Modifier.height(4.dp))
+
+                                Text(
+                                    "${if (stock!!.isPositiveChange) "+" else "-"}${" $%.2f".format(abs(stock!!.priceChange))}",
+                                    color = if (stock!!.isPositiveChange) Color.Green else Color.Red,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+
+                            PercentChangeBadge(
+                                stock!!.percentChange,
+                                stock!!.isPositiveChange,
+                                Modifier.padding(8.dp)
+                            )
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(16.dp))
+
+                Card(
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(4.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        InfoRow("Open", "$${"%.2f".format(stock!!.openPrice)}")
+                        InfoRow("High", "$${"%.2f".format(stock!!.highPrice)}")
+                        InfoRow("Low", "$${"%.2f".format(stock!!.lowPrice)}")
+                        InfoRow("Previous Close", "$${"%.2f".format(stock!!.previousClosePrice)}")
+                    }
+                }
+
+                Spacer(Modifier.height(16.dp))
+
+                Card(
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(4.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        stock!!.website?.let { InfoRow("Website", it) }
+                        stock!!.industry?.let { InfoRow("Industry", it) }
+                        stock!!.exchange?.let { InfoRow("Exchange", it) }
+                        stock!!.country?.let { InfoRow("Country", it) }
+                        stock!!.currency?.let { InfoRow("Currency", it) }
                     }
                 }
             }
 
-            Spacer(Modifier.height(16.dp))
-
-            // Price info card
-            Card(
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(4.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    InfoRow("Open", "$${"%.2f".format(stock!!.openPrice)}")
-                    InfoRow("High", "$${"%.2f".format(stock!!.highPrice)}")
-                    InfoRow("Low", "$${"%.2f".format(stock!!.lowPrice)}")
-                    InfoRow("Previous Close", "$${"%.2f".format(stock!!.previousClosePrice)}")
-                }
-            }
-
-            Spacer(Modifier.height(16.dp))
-
-            // Company info card
-            Card(
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(4.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    stock!!.website?.let { InfoRow("Website", it) }
-                    stock!!.industry?.let { InfoRow("Industry", it) }
-                    stock!!.exchange?.let { InfoRow("Exchange", it) }
-                    stock!!.country?.let { InfoRow("Country", it) }
-                    stock!!.currency?.let { InfoRow("Currency", it) }
-                }
-            }
-
-            StockNewsList(stock!!.newsList)
+            StockNewsList(stock!!.newsList, modifier = Modifier.padding(vertical = 0.dp))
         }
     }
 }
