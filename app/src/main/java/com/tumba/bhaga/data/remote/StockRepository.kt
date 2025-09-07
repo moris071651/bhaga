@@ -1,17 +1,15 @@
 package com.tumba.bhaga.data.remote
 
-import android.util.Log
 import androidx.room.withTransaction
 import com.tumba.bhaga.data.local.StockDatabase
-import com.tumba.bhaga.data.local.toStockSummary
 import com.tumba.bhaga.domain.models.StockSummary
-import com.tumba.bhaga.data.local.CompanyNewsEntity
-import com.tumba.bhaga.data.local.CompanyProfileEntity
-import com.tumba.bhaga.data.local.FavouriteEntity
-import com.tumba.bhaga.data.local.QuoteEntity
-import com.tumba.bhaga.data.local.SearchEntryEntity
-import com.tumba.bhaga.data.local.toSearchEntry
-import com.tumba.bhaga.data.local.toStockDetail
+import com.tumba.bhaga.data.local.entity.CompanyNewsEntity
+import com.tumba.bhaga.data.local.entity.CompanyProfileEntity
+import com.tumba.bhaga.data.local.entity.FavouriteEntity
+import com.tumba.bhaga.data.local.entity.QuoteEntity
+import com.tumba.bhaga.data.local.entity.toSearchEntry
+import com.tumba.bhaga.data.local.entity.toStockDetail
+import com.tumba.bhaga.data.local.entity.toStockSummary
 import com.tumba.bhaga.domain.models.SearchEntry
 import com.tumba.bhaga.domain.models.StockDetail
 import kotlinx.coroutines.Dispatchers
@@ -24,10 +22,9 @@ class StockRepository(
     private val profileCacheMillis: Long = 14 * 24 * 60 * 60_000, // 1 day for profile
     private val newsCacheMillis: Long = 24 * 60 * 60_000     // 1 day for news
 ) {
-
-    private val dao = db.stockDao()
-
     suspend fun getStockSummary(ticker: String): StockSummary = withContext(Dispatchers.IO) {
+        val dao = db.stockDao()
+
         val now = System.currentTimeMillis()
         var company = dao.getCompanyWithQuote(ticker)
 
@@ -46,6 +43,8 @@ class StockRepository(
     }
 
     suspend fun getStockDetail(ticker: String): StockDetail = withContext(Dispatchers.IO) {
+        val dao = db.stockDao()
+
         val now = System.currentTimeMillis()
 
         val companyWithQuoteAndNews = dao.getCompanyWithQuoteAndNews(ticker)
@@ -61,6 +60,8 @@ class StockRepository(
     }
 
     private suspend fun fetchAndSaveProfile(ticker: String, now: Long) {
+        val dao = db.stockDao()
+
         val profile = api.getCompanyProfile(ticker)
         val entity = CompanyProfileEntity(
             ticker = ticker,
@@ -78,6 +79,8 @@ class StockRepository(
     }
 
     private suspend fun fetchAndSaveQuote(ticker: String, now: Long) {
+        val dao = db.stockDao()
+
         val quote = api.getQuote(ticker)
         val entity = QuoteEntity(
             ticker = ticker,
@@ -95,6 +98,8 @@ class StockRepository(
     }
 
     private suspend fun fetchAndSaveNews(ticker: String, now: Long) {
+        val dao = db.newsDao()
+
         val newsList = api.getCompanyNews(ticker)
         val entities = newsList.map {
             CompanyNewsEntity(
@@ -113,32 +118,39 @@ class StockRepository(
     }
 
     suspend fun addFavourite(ticker: String) {
+        val dao = db.favouritesDao()
         return dao.addFavourite(FavouriteEntity(ticker = ticker))
     }
 
     suspend fun removeFavourite(ticker: String) {
+        val dao = db.favouritesDao()
         return dao.removeFavourite(ticker)
     }
 
     suspend fun getFavouriteCompanies(): List<StockSummary> {
+        val dao = db.favouritesDao()
         return dao.getFavouriteCompanies().map {
             it.toStockSummary()
         }
     }
 
     suspend fun invalidateAllStockData() = withContext(Dispatchers.IO) {
+        val dao = db.invalidationDao()
         dao.invalidateAllQuotes()
     }
 
     suspend fun invalidateAllCompanyData() = withContext(Dispatchers.IO) {
+        val dao = db.invalidationDao()
         dao.invalidateAllCompanyProfiles()
     }
 
     suspend fun invalidateAllNewsData() = withContext(Dispatchers.IO) {
+        val dao = db.invalidationDao()
         dao.invalidateAllNews()
     }
 
     suspend fun getAllSearchEntries(): List<SearchEntry> {
+        val dao = db.searchDao()
         return dao.getAllSearchEntries().map {
             it.toSearchEntry()
         }

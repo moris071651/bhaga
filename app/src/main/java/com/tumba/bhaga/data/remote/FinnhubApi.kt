@@ -16,17 +16,17 @@ class FinnhubApi(
     private val client: HttpClient,
     private val tokenManager: TokenManager
 ) {
+    private val BASE = "https://finnhub.io/api/v1"
 
-    private val API_PREFIX = "https://finnhub.io/api/v1"
     suspend fun getQuote(ticker: String): QuoteDto {
-        return client.get("$API_PREFIX/quote") {
+        return client.get("$BASE/quote") {
             parameter("symbol", ticker)
             parameter("token", tokenManager.getToken())
         }.body()
     }
 
     suspend fun getCompanyProfile(ticker: String): CompanyProfileDto {
-        return client.get("$API_PREFIX/stock/profile2") {
+        return client.get("$BASE/stock/profile2") {
             parameter("symbol", ticker)
             parameter("token", tokenManager.getToken())
         }.body()
@@ -36,23 +36,16 @@ class FinnhubApi(
         val today = LocalDate.now()
         val dayAgo = today.minusDays(1)
 
-        return client.get("$API_PREFIX/company-news") {
+        return client.get("$BASE/company-news") {
             parameter("symbol", ticker)
             parameter("from", dayAgo.toString())
             parameter("to", today.toString())
             parameter("token", tokenManager.getToken())
-        }.body<List<CompanyNewsDto>>().take(6)
-    }
-
-    suspend fun getAllTickers(): List<SearchEntryDTO> {
-        return client.get("$API_PREFIX/stock/symbol") {
-            parameter("exchange", "US")
-            parameter("token", tokenManager.getToken())
-        }.body()
+        }.body<List<CompanyNewsDto>>().take(10)
     }
 
     suspend fun checkTokenStatus(token: String): Int {
-        return client.get("$API_PREFIX/quote") {
+        return client.get("$BASE/quote") {
             parameter("symbol", "AAPL")
             parameter("token", token)
         }.status.value
