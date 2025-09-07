@@ -1,14 +1,25 @@
 package com.tumba.bhaga.data.local
 
+import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
+import com.tumba.bhaga.domain.models.SearchEntry
 import com.tumba.bhaga.domain.models.StockDetail
 import com.tumba.bhaga.domain.models.StockNews
 import com.tumba.bhaga.domain.models.StockSummary
+import kotlinx.serialization.SerialName
+
+@Entity(tableName = "search_entry")
+data class SearchEntryEntity(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @ColumnInfo(name = "ticker") val ticker: String,
+    @ColumnInfo(name = "companyName") val companyName: String,
+    @ColumnInfo(name = "logo_url") val logoUrl: String
+)
 
 @Entity(tableName = "company_profile")
 data class CompanyProfileEntity(
@@ -88,8 +99,6 @@ data class FavouriteEntity(
     val ticker: String,
     val addedAt: Long = System.currentTimeMillis()
 )
-
-// when i fetch favourites i what to return List<CompanyWithQuote>
 
 data class CompanyWithQuote(
     @Embedded val profile: CompanyProfileEntity,
@@ -173,4 +182,11 @@ fun CompanyWithQuoteAndNews.toStockDetail(): StockDetail {
         }
     )
 }
-// check if everything is fine
+
+fun SearchEntryEntity.toSearchEntry(): SearchEntry {
+    return SearchEntry(
+        ticker = this.ticker,
+        companyName = this.companyName,
+        logoUrl = this.logoUrl
+    )
+}
