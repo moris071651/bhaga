@@ -2,13 +2,21 @@ package com.tumba.bhaga.ui.screens.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tumba.bhaga.data.di.AppModule.repository
-import com.tumba.bhaga.data.di.AppModule.tokenManager
+import com.tumba.bhaga.data.local.TokenManager
+import com.tumba.bhaga.data.local.TokenValidator
+import com.tumba.bhaga.data.repository.InvalidationRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SettingsViewModel() : ViewModel() {
+@HiltViewModel
+class SettingsViewModel @Inject constructor(
+    private val repository: InvalidationRepository,
+    private val tokenManager: TokenManager,
+    private val tokenValidator: TokenValidator
+) : ViewModel() {
     private val _isTokenValid = MutableStateFlow<Boolean?>(null)
     val isTokenValid: StateFlow<Boolean?> = _isTokenValid
 
@@ -45,7 +53,7 @@ class SettingsViewModel() : ViewModel() {
 
     fun checkTokenValidity(token: String) {
         viewModelScope.launch {
-            _isTokenValid.value = tokenManager.checkToken(token)
+            _isTokenValid.value = tokenValidator.isValid(token)
         }
     }
 

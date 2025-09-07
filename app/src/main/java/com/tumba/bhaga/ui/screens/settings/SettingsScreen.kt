@@ -30,12 +30,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import com.tumba.bhaga.ui.screens.stockdetail.StockDetailViewModel
 
 @Composable
 fun SettingsScreen(
-    viewModel: SettingsViewModel = remember { SettingsViewModel() }
+    viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val isTokenValid by viewModel.isTokenValid.collectAsState()
     var tokenValidityEnabled by remember { mutableStateOf(true) }
