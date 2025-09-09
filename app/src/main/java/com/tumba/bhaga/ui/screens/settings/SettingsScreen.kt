@@ -4,9 +4,11 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
@@ -82,28 +84,45 @@ fun SettingsScreen(
                 singleLine = true
             )
 
-            Button(
-                enabled = tokenValidityEnabled,
-                onClick = {
-                    tokenValidityEnabled = false
+            Row() {
+                Spacer(Modifier.weight(1f))
 
-                    viewModel.checkTokenValidity(token)
-                    if (isTokenValid == true) {
-                        viewModel.setNewToken(token)
+                Button(
+                    enabled = tokenValidityEnabled,
+                    onClick = {
+                        tokenValidityEnabled = false
+                        viewModel.resetNewToken()
+                        token = tokenInitial
+                        tokenValidityEnabled = true
                     }
-                    else {
-                        Toast.makeText(
-                            context,
-                            "Invalid token",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+                ) {
+                    Text("Reset")
+                }
 
-                    tokenValidityEnabled = true
-                },
-                modifier = Modifier.align(Alignment.End)
-            ) {
-                Text("Save")
+                Spacer(Modifier.width(16.dp))
+
+                Button(
+                    enabled = tokenValidityEnabled,
+                    onClick = {
+                        tokenValidityEnabled = false
+
+                        viewModel.checkTokenValidity(token)
+                        if (isTokenValid == true) {
+                            viewModel.setNewToken(token)
+                        }
+                        else {
+                            Toast.makeText(
+                                context,
+                                "Invalid token",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                        tokenValidityEnabled = true
+                    }
+                ) {
+                    Text("Save")
+                }
             }
         }
     }

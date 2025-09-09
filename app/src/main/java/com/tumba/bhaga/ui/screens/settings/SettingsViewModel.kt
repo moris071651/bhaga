@@ -30,6 +30,7 @@ class SettingsViewModel @Inject constructor(
     private fun getToken() {
         viewModelScope.launch {
             _tokenInitial.value = tokenManager.getToken()
+
         }
     }
 
@@ -60,6 +61,13 @@ class SettingsViewModel @Inject constructor(
     fun setNewToken(token: String) {
         viewModelScope.launch {
             tokenManager.saveToken(token)
+        }
+    }
+
+    fun resetNewToken() {
+        viewModelScope.launch {
+            tokenManager.clearToken()
+            _tokenInitial.value = tokenManager.getToken()
         }
     }
 }
