@@ -3,6 +3,7 @@ package com.tumba.bhaga.data.remote
 import com.tumba.bhaga.data.remote.dto.CompanyNewsDto
 import com.tumba.bhaga.data.remote.dto.CompanyProfileDto
 import com.tumba.bhaga.data.remote.dto.QuoteDto
+import com.tumba.bhaga.data.remote.dto.SymbolLookupDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -39,5 +40,12 @@ class FinnhubApi(
             parameter("to", today.toString())
             parameter("token", apiKey)
         }.body<List<CompanyNewsDto>>().take(6)
+    }
+
+    suspend fun searchSymbols(query: String): SymbolLookupDto {
+        return client.get("$API_PREFIX/search") {
+            parameter("q", query)
+            parameter("token", apiKey)
+        }.body()
     }
 }

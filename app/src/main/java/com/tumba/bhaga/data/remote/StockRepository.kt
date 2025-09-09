@@ -10,8 +10,12 @@ import com.tumba.bhaga.data.local.CompanyProfileEntity
 import com.tumba.bhaga.data.local.FavouriteEntity
 import com.tumba.bhaga.data.local.QuoteEntity
 import com.tumba.bhaga.data.local.toStockDetail
+import com.tumba.bhaga.data.remote.dto.SymbolLookupDto
 import com.tumba.bhaga.domain.models.StockDetail
+import com.tumba.bhaga.domain.models.SearchResult
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 
 class StockRepository(
@@ -135,6 +139,19 @@ class StockRepository(
     suspend fun getFavouriteCompanies(): List<StockSummary> {
         return dao.getFavouriteCompanies().map {
             it.toStockSummary()
+        }
+    }
+
+    // -----------------------------
+    // Search
+    // -----------------------------
+    suspend fun searchSymbols(query: String): List<SearchResult> = withContext(Dispatchers.IO) {
+        api.searchSymbols(query).result.map {
+            SearchResult(
+                description = it.description,
+                displaySymbol = it.displaySymbol,
+                symbol = it.symbol
+            )
         }
     }
 }

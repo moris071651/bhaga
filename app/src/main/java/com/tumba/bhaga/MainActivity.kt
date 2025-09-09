@@ -100,7 +100,7 @@ class MainActivity : ComponentActivity() {
                             } else null,
                             searchAction = TopBarAction(
                                 imageVector = Icons.Filled.Search,
-                                onClick = {  }
+                                onClick = { navController.navigate("search") }
                             ),
                         )
                     },

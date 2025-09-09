@@ -1,15 +1,10 @@
 package com.tumba.bhaga.ui.navigation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 import com.tumba.bhaga.ui.screens.favourites.FavouritesScreen
 import com.tumba.bhaga.ui.screens.home.HomeScreen
 import com.tumba.bhaga.ui.screens.search.SearchScreen
@@ -28,37 +23,32 @@ fun BhagaNavHost(
     ) {
         composable("home") {
             HomeScreen(
-                onStockClick = { ticker: String ->
-                    println(ticker)
-                    navController.navigate("details/$ticker")
+                onStockClick = { ticker ->
+                    navController.navigate("detail/$ticker")
+                }
+            )
+        }
+        composable("favourites") {
+            FavouritesScreen(
+                onStockClick = { ticker ->
+                    navController.navigate("detail/$ticker")
                 }
             )
         }
         composable("settings") {
             SettingsScreen()
         }
-
-        composable("favourites") {
-            FavouritesScreen(
-                onStockClick = { ticker: String ->
-                    println(ticker)
-                    navController.navigate("details/$ticker")
+        composable("search") {
+            SearchScreen(
+                onStockClick = { ticker ->
+                    navController.navigate("detail/$ticker")
                 }
             )
         }
-
-        composable("search") {
-            SearchScreen()
-        }
-
-        composable(
-            route = "details/{ticker}",
-            arguments = listOf(navArgument("ticker") {
-                type = NavType.StringType
-            })
-        ) { backStackEntry ->
-            val ticker = backStackEntry.arguments?.getString("ticker")!!
-            StockDetailScreen(ticker = ticker)
+        composable("detail/{ticker}") { backStackEntry ->
+            StockDetailScreen(
+                ticker = backStackEntry.arguments?.getString("ticker") ?: ""
+            )
         }
     }
 }
