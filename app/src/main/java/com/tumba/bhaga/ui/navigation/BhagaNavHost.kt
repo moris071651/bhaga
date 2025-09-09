@@ -1,9 +1,15 @@
 package com.tumba.bhaga.ui.navigation
 
+import androidx.compose.animation.core.animate
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -16,11 +22,42 @@ import com.tumba.bhaga.ui.screens.search.SearchScreen
 import com.tumba.bhaga.ui.screens.settings.SettingsScreen
 import com.tumba.bhaga.ui.screens.stockdetail.StockDetailScreen
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BhagaNavHost(
     navController: NavHostController,
+    scrollBehavior: TopAppBarScrollBehavior,
     modifier: Modifier = Modifier
 ) {
+    LaunchedEffect(navController) {
+        navController.currentBackStackEntryFlow.collect {
+            val currentHeightOffset = scrollBehavior.state.heightOffset
+            val currentContentOffset = scrollBehavior.state.contentOffset
+
+            if (currentHeightOffset != 0f) {
+                animate(
+                    initialValue = currentHeightOffset,
+                    targetValue = 0f
+                ) { value, _ ->
+                    scrollBehavior.state.heightOffset = value
+                }
+            } else {
+                scrollBehavior.state.heightOffset = 0f
+            }
+
+            if (currentContentOffset != 0f) {
+                animate(
+                    initialValue = currentContentOffset,
+                    targetValue = 0f
+                ) { value, _ ->
+                    scrollBehavior.state.contentOffset = value
+                }
+            } else {
+                scrollBehavior.state.contentOffset = 0f
+            }
+        }
+    }
+
     NavHost(
         navController = navController,
         startDestination = "home",
@@ -28,6 +65,7 @@ fun BhagaNavHost(
     ) {
         composable("home") {
             HomeScreen(
+                scrollBehavior = scrollBehavior,
                 onStockClick = { ticker: String ->
                     println(ticker)
                     navController.navigate("details/$ticker")
@@ -40,6 +78,7 @@ fun BhagaNavHost(
 
         composable("favourites") {
             FavouritesScreen(
+                scrollBehavior = scrollBehavior,
                 onStockClick = { ticker: String ->
                     println(ticker)
                     navController.navigate("details/$ticker")

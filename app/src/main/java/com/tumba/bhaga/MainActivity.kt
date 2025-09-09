@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -52,6 +53,8 @@ class MainActivity : ComponentActivity() {
 
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination?.route
+
+            val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
             val navOption = remember {
                 mutableStateListOf(
@@ -109,12 +112,14 @@ class MainActivity : ComponentActivity() {
                                     imageVector = Icons.Filled.Search,
                                     onClick = { navController.navigate("search") }
                                 ),
+                                scrollBehaviorTop = scrollBehavior
                             )
                         }
                     },
                     content = { innerPadding ->
                         BhagaNavHost(
                             navController = navController,
+                            scrollBehavior = scrollBehavior,
                             modifier = Modifier.padding(innerPadding)
                         )
                     },
