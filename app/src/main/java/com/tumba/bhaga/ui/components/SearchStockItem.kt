@@ -2,6 +2,7 @@ package com.tumba.bhaga.ui.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -40,42 +41,19 @@ fun SearchStockItem(
         shape = RoundedCornerShape(16.dp),
         modifier = modifier
             .clickable(onClick = onClick)
-            .padding(8.dp)
             .fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            AsyncImage(
-                model = logoUrl,
-                contentDescription = "${stock.companyName} logo",
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
+            CompanyTag(
+                stock.ticker,
+                stock.companyName,
+                stock.logoUrl,
+                Modifier.fillMaxHeight()
             )
-
-            Spacer(Modifier.width(12.dp))
-
-            Column(
-                modifier = Modifier.fillMaxHeight()
-            ) {
-                Text(
-                    text = stock.ticker,
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Text(
-                    stock.companyName,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1,
-                    modifier = Modifier.fillMaxWidth(0.4f)
-                )
-            }
-
             Spacer(Modifier.weight(1f))
         }
     }
